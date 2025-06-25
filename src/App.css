@@ -1,14 +1,92 @@
+
 .App {
-  text-align: center;
+    width: 100vw;
 }
 
-.App-header {
-  background-color: #282c34;
-  min-height: 100vh;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  font-size: calc(10px + 2vmin);
-  color: white;
+
+/* Commom Area */
+
+.d-none {
+    display: none;
+}
+
+.main-title {
+    text-align: center;
+    font-size: 1.1rem;
+    font-weight: lighter;
+    font-family: 'Press Start 2P', cursive;
+    text-shadow: 2px 2px 2px #000;
+    margin: 0 auto 2rem auto;
+    background-color: #e82323;
+    border-radius: 5px;
+    padding: .5rem 1rem;
+    border: 3px ridge #fff;
+    width: max-content;
+    color: #fff;
+    max-width: 100%;
+}
+
+.-efeitoMarcaTexto {
+    background-color: #c6c6c6;
+    border-radius: 5px;
+    color: red;
+    font-family: Söhne Mono,Monaco,Andale Mono,Ubuntu Mono,monospace !important;
+    font-size: .8rem;
+    font-weight: bolder;
+    padding: 0 2px;
+    text-shadow: none;
+}
+
+.-minWidthMaxContent {
+    min-width: max-content;
+}
+
+main {
+    width: 100vw;
+    min-height: 70vh;
+}
+
+
+section {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    padding-top: 6rem;
+}
+
+section div {
+    height: 100%;
+    width: 100%;
+}
+
+
+@media (max-width: 810px)
+{
+    .main-title {
+        font-size: 1rem;
+        margin-top: 3rem;
+    }
+    section {
+        padding: 1rem 2px;
+    }
+
+    .-efeitoMarcaTexto {
+        font-size: .7rem;
+    }
+}
+
+@media (max-width: 425px)
+{
+    .main-title {
+        margin-bottom: 1rem;
+    }
+
+    .main-title {
+        font-size: .9rem;
+    }
+
+    .-efeitoMarcaTexto {
+        font-size: .6rem;
+        padding: 0 1.5px;
+    }
 }

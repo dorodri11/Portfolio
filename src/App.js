@@ -1,22 +1,26 @@
+import { Outlet } from 'react-router-dom';
+
+import MainNavbar from './components/mainNavbar/MainNavbar';
+import MainFooter from './components/mainFooter/MainFooter';
+
 import './App.css';
 
+
 function App() {
+  
   return (
     <div className="App">
-      <header className="App-header">
-        Cabeçalho
+      <header>
+        <MainNavbar />
       </header>
-
-      <main className="App-main">
-        conteúdo principal 
+      <main>
+        <Outlet />
       </main>
-
-      <footer className="App-footer">
-        Rodapé 
+      <footer>
+        <MainFooter />
       </footer>
     </div>
   );
 }
 
 export default App;
-

@@ -1,0 +1,158 @@
+footer {
+    border: 4px double black;
+    width: 100%;
+    background: var(--main-bgColorLightGrey);
+    border-radius: 5px;
+    font-size: .9rem;
+    color: #000;
+    font-family: var(--main-fontfamily-Press2PLight);
+    font-weight: bold;
+    text-align: center;
+    line-height: 1rem;
+    min-height: 30vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: .5rem;
+}
+
+footer > div {
+    display: flex;
+    flex-direction: column;
+    gap: .5rem;
+}
+
+footer svg {
+    font-size: 2.5rem;
+    color: black;
+}
+
+footer span {
+    font-size: 1rem;
+}
+
+footer h3 {
+    font-size: .7rem;
+    font-family: var(--main-fontFamily-secondTitle);
+}
+
+.footer-icons {
+    display: flex;
+    justify-content: space-evenly;
+    gap: .5rem;
+    min-width: fit-content;
+    flex-wrap: wrap;
+}
+
+.footer-icons--click {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 1rem;
+    border-bottom: 3px double #000;
+    border-bottom-left-radius: 15px;
+    border-bottom-right-radius: 15px;
+    padding: 0 4px;
+}
+
+.footer-icons--click svg {
+    box-shadow: 3px 3px 3px black, -1px -1px 3px black;
+    cursor: pointer;
+    transition: all ease-in-out .3s;
+}
+
+.footer-icons--click a:nth-child(1) > svg {
+    border-bottom-left-radius: 10px;
+}
+
+.footer-icons--click a:nth-child(5) > svg {
+    border-bottom-right-radius: 10px;
+}
+
+.footer-icons--click svg:hover {
+    box-shadow: none;
+    cursor: pointer;
+}
+
+/* .footer-icons--noClick {
+    display: flex;
+    justify-content: center;
+    flex-direction: column;
+}
+
+.footer-icons--noClick div {
+    display: flex;
+    align-items: center;
+}
+
+.footer-icons--noClick div svg{
+    font-size: 2rem;
+}
+
+.footer-icons--noClick div p {
+    font-size: .7rem;
+} */
+
+.footer-icon--email {
+    padding-top: 4px;
+}
+
+.footer-icon--email svg {
+    font-size: 1rem;
+    margin-right: 3px;
+}
+
+.footer-icon-email--container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-top: .3rem;
+}
+
+
+@media (max-width: 810px)
+{
+    .footer-icons--click svg {
+        font-size: 2rem;
+    }
+
+    /* .footer-icons--noClick div svg {
+        font-size: 1.5rem;
+    } */
+
+    /* footer span {
+        font-size: 1.2rem;
+    } */
+    footer {
+        font-size: .8rem;
+    }
+
+    footer h3 {
+        font-size: .65rem;
+    }
+}
+
+
+@media (max-width: 400px)
+{
+    .footer-icons {
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+    }
+
+    /* .footer-icons--noClick {
+        align-items: center;
+    } */
+
+    footer {
+        font-size: .7rem;
+    }
+
+    footer h3 {
+        font-size: .64rem;
+    }
+    .footer-icon-email--container {
+        margin-top: .2rem;
+    }
+}
