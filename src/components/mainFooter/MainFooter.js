@@ -14,7 +14,7 @@ export default function MainFooter() {
     return (
         <div>
         <div className='footer-description'>
-          <p>Site desenvolvido pelo Douglas Rodrigues ;D</p>
+          <p>Site desenvolvido pelo Douglas Rodrigues.</p>
           <p>Redes sociais abaixo, apenas clique no Icon <span>✓</span></p>
           <div className='footer-copyright'>
             <div className='footer-icon-email--container'>
