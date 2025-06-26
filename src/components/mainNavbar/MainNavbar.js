@@ -5,13 +5,14 @@ import { useLocation } from 'react-router-dom';
 import { MdFiberNew } from 'react-icons/md';
 import { MdNotificationImportant } from 'react-icons/md';
 
+import interestellarTheme from '../../resources/audios/Interstellar Main Theme - Hans Zimmer.mp3';
+import theLastOfUsTheme from '../../resources/audios/TheLastOfus-Theme.mp3';
+
 import { IoPlayCircle } from 'react-icons/io5';
-import { IoPlaySkipBackCircle } from 'react-icons/io5'; 
+import { IoPlaySkipBackCircle } from 'react-icons/io5';
 import { IoPlaySkipForwardCircle } from 'react-icons/io5';
 import { IoPauseCircle } from 'react-icons/io5';
 
-import InterestellarTheme from '../../resources/audios/Interstellar Main Theme - Hans Zimmer.mp3';
-import TheLastofUsTheme from '../../resources/audios/TheLastOfus-Theme.mp3';
 
 import './MainNavbar.css';
 
@@ -132,10 +133,9 @@ export default function MainNavbar() {
 
     // Harcoded, porém esta em testes ainda, pretendo retirar TODA a lógica deste arquivo.
     const [listOfMusics, setListOfMusics] = useState([
-        {title:"InterestelarTheme", src:`${InterestellarTheme}`, totalDurationInSeconds: 32.256},
-        {title:"TLOUTheme", src:`${TheLastofUsTheme}`, totalDurationInSeconds: 32.256},
+        { title: "Interestellar Theme", src: `${interestellarTheme}`, totalDurationInSeconds: 222.029206 },
+        { title: "The Last Of Us Theme", src: `${theLastOfUsTheme}`, totalDurationInSeconds: 222.029206 },
     ]);
-
 
     // Além de validar, também ajusta se o index ficar negativo ou maior do que a lista
     // Criando assim efeito de rotação, ou seja, se o index passar do tamanho da lista
@@ -197,16 +197,22 @@ export default function MainNavbar() {
         // Serve como se fosse um troca-fitas, ele recebe o index, prepara e da play na musica no objeto player
         // player == elemento HTML <audio> único para os dois containers se não iria tocar duas musicas ao mesmo tempo
         const musicRenderer = (indexOfCurrentMusic) => {
-
-            let musicSelected = listOfMusics[Number(indexOfCurrentMusic)];
-            player.setAttribute("src", musicSelected.src);
-
+            const musicSelected = listOfMusics[Number(indexOfCurrentMusic)];
+        
+            player.pause();
+            player.currentTime = 0;
+        
+            player.src = musicSelected.src;
+            player.load();
+        
             player.addEventListener("loadeddata", () => {
                 document.title = musicSelected.title;
-            });
-
-            player.play();
-        } 
+            }, { once: true });
+        
+            player.addEventListener("canplaythrough", () => {
+                player.play().catch(err => console.error("Erro ao tocar:", err));
+            }, { once: true });
+        };
 
         // Ajusta os icones visuais de acordo com o estado do Player, ou seja, 
         // - Se a musica estiver rolando o icone de "pause" aparece, 
@@ -275,51 +281,46 @@ export default function MainNavbar() {
          player.addEventListener("ended", () => {
 
             setLocalStorage_indexOfCurrentMusic(Number(getLocalStorage_indexOfCurrentMusic())+1);
-            validateIndexOfMusic(Number(getLocalStorage_indexOfCurrentMusic()));
-            var newMusic = listOfMusics[Number(getLocalStorage_indexOfCurrentMusic())];
-            player.setAttribute("src", newMusic.src);
-            player.play();
-
-            // coloca no titulo o nome da musica:
-            player.addEventListener("loadeddata", () => {
-                document.title = newMusic.title;
-            });
+             validateIndexOfMusic(Number(getLocalStorage_indexOfCurrentMusic())); 
+            musicRenderer(Number(getLocalStorage_indexOfCurrentMusic()));
 
          });
 
-        player.addEventListener("timeupdate", () => {
+        player.addEventListener("timeupdate", () => { 
+            // console.log('player.duration :>>', player.duration);
             if ((player.currentTime / player.duration) !== NaN && (player.currentTime / player.duration) > 0) {
                 playerProgressBarsElements[0].value = (player.currentTime / player.duration);
                 playerProgressBarsElements[1].value = (player.currentTime / player.duration);
-            }
+            } 
         });
+        
 
-        function handlePlayerPlayClick () {
-            if (Number(getLocalStorage_stateOfMusic().stateOfTime) > 0 && Number(getLocalStorage_stateOfMusic().stateOfTime) != player.duration) {
-                // ja existe um estado de musica salvo! reculpera qual musica e em qual parte parou:
-                let musicSelected = listOfMusics[Number(getLocalStorage_stateOfMusic().indexOfMusic)];
-                player.setAttribute("src", musicSelected.src)
-                player.currentTime = Number(getLocalStorage_stateOfMusic().stateOfTime);
+        function handlePlayerPlayClick() {
+            const state = getLocalStorage_stateOfMusic();
+            const musicIndex = Number(state.indexOfMusic);
+            const stateTime = Number(state.stateOfTime);
 
+            const musicSelected = listOfMusics[musicIndex];
+        
+            player.pause();
+            player.currentTime = 0;
+            player.src = musicSelected.src;
+            player.load();
+
+            // coloca no titulo o nome da musica:
+            player.addEventListener("loadeddata", () => {
+                document.title = musicSelected.title;
+            }, { once: true });
+        
+            player.addEventListener("canplaythrough", () => {
+                if (stateTime > 0 && stateTime !== player.duration) {
+                    player.currentTime = stateTime;
+                }
                 player.muted = true;
-                player.play();
-                player.muted = false;
-
-                // coloca no titulo o nome da musica:
-                player.addEventListener("loadeddata", () => {
-                    document.title = musicSelected.title;
-                });
-
-            } else {
-                // primeira vez que deu play, ou acabou a musica toda anterior, carrega c/ o index da musica corrente
-
-                musicRenderer(Number(getLocalStorage_indexOfCurrentMusic()));
-
-                player.muted = true;
-                player.play();
-                player.muted = false;
-                
-            }
+                player.play()
+                    .then(() => { player.muted = false; })
+                    .catch(err => console.error("Erro ao tocar:", err));
+            }, { once: true });
             
             // Flagga que o Play está ativo, sumindo com o icon de Play e Aparecendo o icon de Pause
             adjustTheDisplayOfIconsPlayAndPause_pauseShowUp();
@@ -328,12 +329,15 @@ export default function MainNavbar() {
         playerPlaysElements[1].children[0].addEventListener("click", () => handlePlayerPlayClick());
 
 
-        function handlePlayerPauseClick () {
-            // salva o estado em que a música foi pausada em local storage
-            setLocalStorage_stateOfMusic({indexOfMusic: Number(getLocalStorage_indexOfCurrentMusic()), stateOfTime: Number(player.currentTime)});
-
+        function handlePlayerPauseClick() {
+        // salva o estado em que a música foi pausada em local storage
+            setLocalStorage_stateOfMusic({
+                indexOfMusic: Number(getLocalStorage_indexOfCurrentMusic()),
+                stateOfTime: Number(player.currentTime)
+            });
+        
             player.pause();
-            
+        
             // Flagga que o Pause está ativo, sumindo com o icon de Pause e Aparecendo o icon de Play
             // Obs: Não estraí em outro método pois essa lógica só é aplicada aqui, ela é exatamente
             // a mesma lógica que o `adjustTheDisplayOfIconsPlayAndPause_pauseShowUp()` PORÉM invertido, ou seja, 
@@ -342,12 +346,10 @@ export default function MainNavbar() {
             // Quando da play em sí na musica, Quando vai para a próxima, e Quando vai para a anterior;
             if (!playerPausesElements[0].classList.contains("isActiv")) {
                 playerPausesElements[0].classList.add("isActiv");
-
                 playerPlaysElements[0].classList.remove("isActiv");
             }
             if (!playerPausesElements[1].classList.contains("isActiv")) {
                 playerPausesElements[1].classList.add("isActiv");
-
                 playerPlaysElements[1].classList.remove("isActiv");
             }
         }
@@ -357,13 +359,12 @@ export default function MainNavbar() {
 
          /* Mudando de musicas Next e Previous */
 
-        function handlePlayerSkipPreviousClick () {
-            setLocalStorage_indexOfCurrentMusic(Number(getLocalStorage_indexOfCurrentMusic())-1);
-
-            validateIndexOfMusic(Number(getLocalStorage_indexOfCurrentMusic()));
-
-            musicRenderer(Number(getLocalStorage_indexOfCurrentMusic()));
-
+         function handlePlayerSkipPreviousClick () {
+            const newIndex = Number(getLocalStorage_indexOfCurrentMusic()) - 1;
+            setLocalStorage_indexOfCurrentMusic(newIndex);
+            validateIndexOfMusic(newIndex);
+        
+            musicRenderer(newIndex);
             adjustTheDisplayOfIconsPlayAndPause_pauseShowUp();
         }
         playerSkipPreviousElements[0].children[0].addEventListener("click", () => handlePlayerSkipPreviousClick());
@@ -371,12 +372,11 @@ export default function MainNavbar() {
 
 
         function handlePlayerSkipNextClick () {
-            setLocalStorage_indexOfCurrentMusic(Number(getLocalStorage_indexOfCurrentMusic())+1);
-
-            validateIndexOfMusic(Number(getLocalStorage_indexOfCurrentMusic()));
-
-            musicRenderer(Number(getLocalStorage_indexOfCurrentMusic()));
-
+            const newIndex = Number(getLocalStorage_indexOfCurrentMusic()) + 1;
+            setLocalStorage_indexOfCurrentMusic(newIndex);
+            validateIndexOfMusic(newIndex);
+        
+            musicRenderer(newIndex);
             adjustTheDisplayOfIconsPlayAndPause_pauseShowUp();
         }
         playerSkipNextsElements[0].children[0].addEventListener("click", () => handlePlayerSkipNextClick());
@@ -400,7 +400,7 @@ export default function MainNavbar() {
         <a target="_blank" className="-btn-ancorToJavaBibleScreen -minWidthMaxContent" href="https://bibleofjava.wellisonbertelli.com.br/" rel="Link Biblia do Java" onClick={() => setNavBarEmColumn(true)}>Bíblia do Java <MdFiberNew className="animaIconPisca"/></a>        
         {/* <a target="_blank" href="https://bibleofjava.wellisonbertelli.com.br/" rel="Link Curriculo" onClick={() => setNavBarEmColumn(true)}>Currículo</a>   */}
 
-        <audio id="audioPlayer" src={InterestellarTheme}></audio>
+        <audio id="audioPlayer" src={interestellarTheme}></audio>
         <div className="audioPlayer--container --audioPlayer--container --navBar -minWidthMaxContent">
             <div className="audioPlayer--controls">
                 <i className="audioPlayer-control--skipPrevious"><IoPlaySkipBackCircle/></i>
